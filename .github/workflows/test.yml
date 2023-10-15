@@ -37,6 +37,14 @@ jobs:
           if [ -f requirements.txt ]; then pip install -r requirements.txt; fi
         if: steps.cache-venv.outputs.cache-hit != 'true'
       - 
+        name: 'Print python version'
+        run: |
+          which python
+          python --version
+          source ./.venv/bin/activate
+          which python
+          python --version
+      - 
         name: 'Run a simple python script directly'
         run: |
           source ./.venv/bin/activate
