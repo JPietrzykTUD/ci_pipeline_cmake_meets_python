@@ -1,0 +1,48 @@
+name: 'test'
+
+on:
+  push:
+    branches: ['main']
+
+permissions:
+  contents: read
+
+jobs:
+  install-and-build:
+    runs-on: ubuntu-latest
+    steps:
+      -
+        uses: actions/checkout@v3
+      -
+        name: Set up Python ${{ matrix.python-version }}
+        uses: actions/setup-python@v4
+        with:
+          python-version: "3.10"
+          cache: "pip"
+      - 
+        name: Cache virtualenv
+        uses: actions/cache@v3
+        id: cache-venv
+        with:
+          path: ./.venv/
+          key: ${{ runner.os }}-.10-venv-${{ hashFiles('requirements.txt') }}
+          restore-keys: |
+            ${{ runner.os }}-3.10-venv-
+      -
+        name: 'Install python dependencies for generator'
+        run: |
+          python -m venv ./.venv
+          source ./.venv/bin/activate
+          python -m pip install --upgrade pip
+          if [ -f requirements.txt ]; then pip install -r requirements.txt; fi
+        if: steps.cache-venv.outputs.cache-hit != 'true'
+      - 
+        name: 'Run a simple python script directly'
+        run: |
+          source ./.venv/bin/activate
+          python main.py
+      -
+        name: 'Use CMake for the same script'
+        run: |
+          source ./.venv/bin/activate
+          cmake -B build -S .
