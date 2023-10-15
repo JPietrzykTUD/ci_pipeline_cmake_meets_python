@@ -53,4 +53,4 @@ jobs:
         name: 'Use CMake for the same script'
         run: |
           source ./.venv/bin/activate
-          cmake -B build -S .
+          Python3_ROOT_DIR= cmake -B build -S .
